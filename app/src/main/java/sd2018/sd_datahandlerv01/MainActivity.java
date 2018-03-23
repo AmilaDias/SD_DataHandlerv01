@@ -115,12 +115,11 @@ public class MainActivity extends AppCompatActivity {
                     setDUMMYDATA();
                     syncToFirebase();
                     try {
-                        TimeUnit.MILLISECONDS.sleep(1000);
+                        TimeUnit.MILLISECONDS.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-
             }
         });
         //////////////////////////////////////////////
