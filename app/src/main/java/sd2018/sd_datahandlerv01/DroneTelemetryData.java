@@ -14,7 +14,7 @@ public class DroneTelemetryData {
 
     public DroneTelemetryData() {
         setAltitude(0.0);
-        setAirSpeed(0.0);
+        setAirSpeed(0.0, 0.0);
         setCurrLatitude(0.0);
         setCurrLongitude(0.0);
         setBatteryPercentage(0);
@@ -33,8 +33,13 @@ public class DroneTelemetryData {
         return airSpeed;
     }
 
-    public void setAirSpeed(double airSpeed) {
-        this.airSpeed = airSpeed;
+    public void setAirSpeed(double speedX, double speedY) {
+
+        if(Math.abs(speedX) > Math.abs(speedY)){
+            this.airSpeed = speedX;
+        } else {
+            this.airSpeed = speedY;
+        }
     }
 
     public double getCurrLatitude() {

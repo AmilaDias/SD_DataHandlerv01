@@ -2,6 +2,7 @@ package sd2018.sd_datahandlerv01;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dji.common.battery.BatteryState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.sdk.base.BaseComponent;
@@ -48,10 +50,30 @@ import dji.common.flightcontroller.*;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getName();
+
+    /**
+     * Global variables
+     */
+    //Public variables
     public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
+
+    //Private variables
+    private static final String TAG = MainActivity.class.getName();
     private static BaseProduct mProduct;
     private Handler mHandler;
+    private FlightControllerState flightControllerInfo;
+    private LocationCoordinate3D droneCoordinates3D;
+    private List<String> missingPermission = new ArrayList<>();
+    private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
+    private static final int REQUEST_PERMISSION_CODE = 12345;
+    private DatabaseReference databaseRef;
+    private DroneTelemetryData droneData = new DroneTelemetryData();
+    BatteryState droneBattery;
+
+
+    /**
+     * Permissions required to run application
+     */
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             android.Manifest.permission.VIBRATE,
             android.Manifest.permission.INTERNET,
@@ -67,11 +89,7 @@ public class MainActivity extends AppCompatActivity {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_PHONE_STATE,
     };
-    private List<String> missingPermission = new ArrayList<>();
-    private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
-    private static final int REQUEST_PERMISSION_CODE = 12345;
-    private DatabaseReference databaseRef;
-    private DroneTelemetryData droneData = new DroneTelemetryData();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseRef = database.getReference();
+
+        //Initialize drone telemetry producers
+        flightControllerInfo = new FlightControllerState();
+        droneCoordinates3D = new LocationCoordinate3D(0,0,0);
     }
 
 
@@ -116,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
 /**
  ///////////////////////////////////////////DJI CODE///////////////////////////////////////////////////
  */
-
 
 
     /**
@@ -229,8 +250,12 @@ public class MainActivity extends AppCompatActivity {
  ///////////////////////////////////////////SD2018 Code///////////////////////////////////////////////////
  */
 
-    private void readDroneTelemetry(){
-        droneData.setAltitude(Null);
+    private void setDroneTelemetry(){
+        droneData.setAltitude(droneCoordinates3D.getAltitude());
+        droneData.setCurrLatitude(droneCoordinates3D.getLatitude());
+        droneData.setCurrLongitude(droneCoordinates3D.getLongitude());
+        droneData.setAirSpeed(flightControllerInfo.getVelocityX(),flightControllerInfo.getVelocityY());
+        droneData.setBatteryPercentage(droneBattery.getChargeRemainingInPercent());
     }
 
 }
