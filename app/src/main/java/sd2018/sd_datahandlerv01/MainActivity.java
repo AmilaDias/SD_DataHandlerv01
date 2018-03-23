@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
     private List<String> missingPermission = new ArrayList<>();
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final int REQUEST_PERMISSION_CODE = 12345;
+    private DatabaseReference databaseRef;
+    private DroneTelemetryData droneData = new DroneTelemetryData();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,11 +83,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Initialize DJI SDK Manager
         mHandler = new Handler(Looper.getMainLooper());
-        
+
         //Initialize Google Firebase Database
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference databaseRef = database.getReference();
+        databaseRef = database.getReference();
     }
+
+
     /**
      * Checks if there is any missing permissions, and
      * requests runtime permission if needed.
@@ -106,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_PERMISSION_CODE);
         }
     }
+
+/**
+ ///////////////////////////////////////////DJI CODE///////////////////////////////////////////////////
+ */
+
+
+
     /**
      * Result of runtime permission request
      */
@@ -129,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
             showToast("Missing permissions!!!");
         }
     }
+
 
     private void startSDKRegistration() {
         if (isRegistrationInProgress.compareAndSet(false, true)) {
@@ -161,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private BaseProduct.BaseProductListener mDJIBaseProductListener = new BaseProduct.BaseProductListener() {
         @Override
         public void onComponentChange(BaseProduct.ComponentKey key, BaseComponent oldComponent, BaseComponent newComponent) {
@@ -175,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     private BaseComponent.ComponentListener mDJIComponentListener = new BaseComponent.ComponentListener() {
         @Override
         public void onConnectivityChange(boolean isConnected) {
@@ -182,10 +198,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     private void notifyStatusChange() {
         mHandler.removeCallbacks(updateRunnable);
         mHandler.postDelayed(updateRunnable, 500);
     }
+
 
     private Runnable updateRunnable = new Runnable() {
         @Override
@@ -194,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
             sendBroadcast(intent);
         }
     };
+
 
     private void showToast(final String toastMsg) {
         Handler handler = new Handler(Looper.getMainLooper());
@@ -204,5 +223,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+/**
+ ///////////////////////////////////////////SD2018 Code///////////////////////////////////////////////////
+ */
+
+    private void readDroneTelemetry(){
+        droneData.setAltitude(Null);
+    }
+
 }
 
