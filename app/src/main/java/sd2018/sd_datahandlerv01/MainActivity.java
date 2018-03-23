@@ -12,10 +12,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Intent;
@@ -95,12 +101,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // When the compile and target version is higher than 22, please request the following permission at runtime to ensure the SDK works well.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkAndRequestPermissions();
-        }
+        }*/
         setContentView(R.layout.activity_main);
+
+        //////////////////////TEST////////////////////
+        final Button dummyButton = findViewById(R.id.mStartButton);
+        dummyButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                for (int i = 0; i < 101; i++)
+                {
+                    setDUMMYDATA();
+                    syncToFirebase();
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+        //////////////////////////////////////////////
         //Initialize DJI SDK Manager
-        mHandler = new Handler(Looper.getMainLooper());
+//        mHandler = new Handler(Looper.getMainLooper());
 
         //Initialize Google Firebase Database
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -250,12 +275,30 @@ public class MainActivity extends AppCompatActivity {
  ///////////////////////////////////////////SD2018 Code///////////////////////////////////////////////////
  */
 
-    private void setDroneTelemetry(){
+    private void getTelemetryData(){
         droneData.setAltitude(droneCoordinates3D.getAltitude());
         droneData.setCurrLatitude(droneCoordinates3D.getLatitude());
         droneData.setCurrLongitude(droneCoordinates3D.getLongitude());
         droneData.setAirSpeed(flightControllerInfo.getVelocityX(),flightControllerInfo.getVelocityY());
         droneData.setBatteryPercentage(droneBattery.getChargeRemainingInPercent());
+    }
+
+    private void syncToFirebase(){
+        databaseRef.child("Drone Telemetry").child("liveData").child("currBattery").setValue(droneData.getBatteryPercentage());
+        databaseRef.child("Drone Telemetry").child("liveData").child("currHeight").setValue(droneData.getAltitude());
+        databaseRef.child("Drone Telemetry").child("liveData").child("currLatt").setValue(droneData.getCurrLatitude());
+        databaseRef.child("Drone Telemetry").child("liveData").child("currLong").setValue(droneData.getCurrLongitude());
+        databaseRef.child("Drone Telemetry").child("liveData").child("currSpeed").setValue(droneData.getAirSpeed());
+    }
+
+
+    private void setDUMMYDATA(){
+        Random r = new Random();
+        droneData.setAltitude(r.nextInt(101));
+        droneData.setCurrLatitude(r.nextInt(101));
+        droneData.setCurrLongitude(r.nextInt(101));
+        droneData.setAirSpeed(r.nextInt(101),r.nextInt(101));
+        droneData.setBatteryPercentage(r.nextInt(101));
     }
 
 }
