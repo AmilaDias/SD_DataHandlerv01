@@ -101,12 +101,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // When the compile and target version is higher than 22, please request the following permission at runtime to ensure the SDK works well.
-/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkAndRequestPermissions();
-        }*/
+        }
         setContentView(R.layout.activity_main);
 
-        //////////////////////TEST////////////////////
+/*        //////////////////////TEST////////////////////
         final Button dummyButton = findViewById(R.id.mStartButton);
         dummyButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -121,17 +121,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
-        //////////////////////////////////////////////
-        //Initialize DJI SDK Manager
-//        mHandler = new Handler(Looper.getMainLooper());
+        });*/
 
-        //Initialize Google Firebase Database
+
+        //////////////////////////////////////////////
+        //       Initialize DJI SDK Manager         //
+        //////////////////////////////////////////////
+        mHandler = new Handler(Looper.getMainLooper());
+
+
+        //////////////////////////////////////////////
+        //    Initialize Google Firebase Database   //
+        //////////////////////////////////////////////
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseRef = database.getReference();
 
-        //Initialize drone telemetry producers
+        //////////////////////////////////////////////
+        //   Initialize drone telemetry producers   //
+        //////////////////////////////////////////////
         flightControllerInfo = new FlightControllerState();
         droneCoordinates3D = new LocationCoordinate3D(0,0,0);
     }
