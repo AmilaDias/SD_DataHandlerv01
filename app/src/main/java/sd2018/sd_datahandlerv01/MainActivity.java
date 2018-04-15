@@ -16,11 +16,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION_CODE = 12345;
     private DatabaseReference databaseRef;
     private DroneTelemetryData droneData = new DroneTelemetryData();
+    private int dummyBattery;
     BatteryState droneBattery;
 
 
@@ -100,14 +103,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // When the compile and target version is higher than 22, please request the following permission at runtime to ensure the SDK works well.
-/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkAndRequestPermissions();
-        }*/
+
+        /*
+        * DJI Project verification
+        * */
+//        // When the compile and target version is higher than 22, please request the following permission at runtime to ensure the SDK works well.
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            checkAndRequestPermissions();
+//        }
         setContentView(R.layout.activity_main);
 
         //////////////////////TEST////////////////////
         final Button dummyButton = findViewById(R.id.mStartButton);
+        dummyBattery = 100;
         dummyButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 for (int i = 0; i < 101; i++)
@@ -115,14 +123,16 @@ public class MainActivity extends AppCompatActivity {
                     setDUMMYDATA();
                     syncToFirebase();
                     try {
-                        TimeUnit.MILLISECONDS.sleep(500);
+                        TimeUnit.MILLISECONDS.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    dummyBattery--;
                 }
             }
         });
         //////////////////////////////////////////////
+
         //Initialize DJI SDK Manager
 //        mHandler = new Handler(Looper.getMainLooper());
 
@@ -283,22 +293,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void syncToFirebase(){
-        databaseRef.child("Drone Telemetry").child("liveData").child("currBattery").setValue(droneData.getBatteryPercentage());
-        databaseRef.child("Drone Telemetry").child("liveData").child("currHeight").setValue(droneData.getAltitude());
-        databaseRef.child("Drone Telemetry").child("liveData").child("currLatt").setValue(droneData.getCurrLatitude());
-        databaseRef.child("Drone Telemetry").child("liveData").child("currLong").setValue(droneData.getCurrLongitude());
-        databaseRef.child("Drone Telemetry").child("liveData").child("currSpeed").setValue(droneData.getAirSpeed());
+        //Latitude
+        databaseRef.child("Drone Telemetry").child("liveData").child("1").setValue(droneData.getCurrLatitude());
+        //Longitude
+        databaseRef.child("Drone Telemetry").child("liveData").child("2").setValue(droneData.getCurrLongitude());
+        //Altitude
+        databaseRef.child("Drone Telemetry").child("liveData").child("3").setValue(droneData.getAltitude());
+        //Battery
+        databaseRef.child("Drone Telemetry").child("liveData").child("4").setValue(droneData.getBatteryPercentage());
+        //Speed
+        databaseRef.child("Drone Telemetry").child("liveData").child("5").setValue(droneData.getAirSpeed());
     }
 
 
     private void setDUMMYDATA(){
-        Random r = new Random();
-        droneData.setAltitude(r.nextInt(101));
-        droneData.setCurrLatitude(r.nextInt(101));
-        droneData.setCurrLongitude(r.nextInt(101));
-        droneData.setAirSpeed(r.nextInt(101),r.nextInt(101));
-        droneData.setBatteryPercentage(r.nextInt(101));
+        droneData.setAltitude(setAlitude());
+        droneData.setCurrLatitude(setLatitude());
+        droneData.setCurrLongitude(setLongitude());
+        droneData.setAirSpeed(setAirSpeed(), setAirSpeed());
+        droneData.setBatteryPercentage(dummyBattery);
     }
+
+    private double setLatitude(){
+        double tempLat = ThreadLocalRandom.current().nextDouble(-90, 90 + 1);
+        DecimalFormat df = new DecimalFormat("##.###");
+        return Double.parseDouble(df.format(tempLat));
+    }
+
+    private double setLongitude(){
+        double tempLong = ThreadLocalRandom.current().nextDouble(-90, 90 + 1);
+        DecimalFormat df = new DecimalFormat("##.###");
+        return Double.parseDouble(df.format(tempLong));
+    }
+
+    private double setAlitude(){
+        double tempAlt = ThreadLocalRandom.current().nextDouble(15);
+        DecimalFormat df = new DecimalFormat("##.#");
+        return Double.parseDouble(df.format(tempAlt));
+    }
+
+    private double setAirSpeed(){
+        double tempSpeed = ThreadLocalRandom.current().nextDouble(30);
+        DecimalFormat df = new DecimalFormat("##.##");
+        return Double.parseDouble(df.format(tempSpeed));
+    }
+
+
 
 }
 
