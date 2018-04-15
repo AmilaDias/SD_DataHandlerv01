@@ -34,7 +34,7 @@ android {
         doNotStrip "*/*/libduml_vision_bokeh.so"
         doNotStrip "*/*/libyuv2.so"
         doNotStrip "*/*/libGroudStation.so"
-        doNotStrips "*/*/libFRCorkscrew.so"
+        doNotStrip "*/*/libFRCorkscrew.so"
         doNotStrip "*/*/libUpgradeVerify.so"
         doNotStrip "*/*/libFR.so"
     }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -306,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setDUMMYDATA(){
         droneData.setAltitude(setAlitude());
         droneData.setCurrLatitude(setLatitude());
@@ -314,24 +316,28 @@ public class MainActivity extends AppCompatActivity {
         droneData.setBatteryPercentage(dummyBattery);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private double setLatitude(){
         double tempLat = ThreadLocalRandom.current().nextDouble(-90, 90 + 1);
         DecimalFormat df = new DecimalFormat("##.###");
         return Double.parseDouble(df.format(tempLat));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private double setLongitude(){
         double tempLong = ThreadLocalRandom.current().nextDouble(-90, 90 + 1);
         DecimalFormat df = new DecimalFormat("##.###");
         return Double.parseDouble(df.format(tempLong));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private double setAlitude(){
         double tempAlt = ThreadLocalRandom.current().nextDouble(15);
         DecimalFormat df = new DecimalFormat("##.#");
         return Double.parseDouble(df.format(tempAlt));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private double setAirSpeed(){
         double tempSpeed = ThreadLocalRandom.current().nextDouble(30);
         DecimalFormat df = new DecimalFormat("##.##");
